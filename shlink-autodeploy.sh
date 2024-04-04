@@ -12,3 +12,4 @@ userpasswd=$(pwgen -y -c -n -s 24 1)
 /sbin/useradd -m -p ${userpasswd} ${username}
 
 # n-1 print passwd for user
+echo "The new user is " ${user} "identified by: ${userpasswd}"
