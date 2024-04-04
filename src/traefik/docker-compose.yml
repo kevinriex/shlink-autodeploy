@@ -1,0 +1,29 @@
+version: '3'
+
+networks:
+  proxy:
+    external: true
+
+services:
+  traefik:
+    image: traefik:latest
+    container_name: traefik
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./config:/etc/traefik
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./access.log:/var/log/traefik/access.log
+    labels:
+      traefik.enable: true
+      traefik.http.routers.traefik_https.rule: Host(`proxy.kgv-adl.kyrtech.net`)
+      traefik.http.routers.traefik_https.entrypoints: websecure
+      traefik.http.routers.traefik_https.tls: true
+      traefik.http.routers.traefik_https.tls.certResolver: production
+      traefik.http.routers.traefik_https.service: api@internal 
+      traefik.http.middlewares.basic-auth-traefik.basicauth.users: dude:$$2y$$05$$N3n52AujFzGLdYSwuMeK1OETJat3QOuyY0GjuQDzEF9hqsn0FAOVW
+      traefik.http.routers.traefik_https.middlewares: basic-auth-traefik
+    networks:
+      - proxy
+    restart: always

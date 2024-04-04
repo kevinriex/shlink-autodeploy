@@ -1,0 +1,61 @@
+version: '3'
+
+networks:
+  proxy:
+    external: true
+
+services:
+  shlink:
+    image: shlinkio/shlink:stable
+    container_name: shlink_master
+    environment:
+      - DEFAULT_DOMAIN=kgv-adl.kyrtech.net
+      - IS_HTTPS_ENABLED=true
+      - GEOLITE_LICENSE_KEY=
+      - DB_DRIVER=mariadb
+      - DB_USER=shlink
+      - DB_PASSWORD=changeme
+      - DB_HOST=shlink_database
+      - DB_NAME=shlink
+    restart: always
+    networks:
+      - proxy
+    labels:
+      traefik.enable: true
+      traefik.http.routers.shlink-backend.entrypoints: websecure
+      traefik.http.routers.shlink-backend.rule: Host(`kgv-adl.kyrtech.net`)
+      traefik.http.routers.shlink-backend.tls: true
+      traefik.http.routers.shlink-backend.tls.certresolver: production
+      traefik.http.services.shlink-backend.loadbalancer.server.port: 8080
+
+  database:
+    image: mariadb:10.8
+    container_name: shlink_database
+    restart: always
+    environment:
+      - MARIADB_ROOT_PASSWORD=changemeroot
+      - MARIADB_DATABASE=shlink
+      - MARIADB_USER=shlink
+      - MARIADB_PASSWORD=changeme
+    volumes:
+      - ./db_data:/var/lib/mysql
+    networks:
+      - proxy
+
+  web:
+    container_name: shlink_web
+    image: shlinkio/shlink-web-client:latest
+    volumes:
+      - ./data/servers.json:/usr/share/nginx/html/servers.json
+    restart: always
+    networks:
+      - proxy
+    labels:
+      traefik.enable: true
+      traefik.http.routers.shlink-frontend.entrypoints: websecure
+      traefik.http.routers.shlink-frontend.rule: Host(`links.kyrtech.net`)
+      traefik.http.routers.shlink-frontend.tls: true
+      traefik.http.routers.shlink-frontend.tls.certresolver: production
+      traefik.http.services.shlink-frontend.loadbalancer.server.port: 80
+      traefik.http.middlewares.basic-auth.basicauth.users: kyr:$$2y$$05$$N3n52AujFzGLdYSwuMeK1OETJat3QOuyY0GjuQDzEF9hqsn0FAOVW
+      traefik.http.routers.shlink-frontend.middlewares: basic-auth
