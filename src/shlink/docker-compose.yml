@@ -55,5 +55,5 @@ services:
       traefik.http.routers.shlink-frontend.tls: true
       traefik.http.routers.shlink-frontend.tls.certresolver: production
       traefik.http.services.shlink-frontend.loadbalancer.server.port: 80
-      traefik.http.middlewares.basic-auth.basicauth.users: kyr:$$2y$$05$$N3n52AujFzGLdYSwuMeK1OETJat3QOuyY0GjuQDzEF9hqsn0FAOVW
+      traefik.http.middlewares.basic-auth.basicauth.users: dude:$$2y$$05$$N3n52AujFzGLdYSwuMeK1OETJat3QOuyY0GjuQDzEF9hqsn0FAOVW
       traefik.http.routers.shlink-frontend.middlewares: basic-auth
