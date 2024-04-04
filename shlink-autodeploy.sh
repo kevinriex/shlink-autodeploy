@@ -4,7 +4,7 @@
 
 apt-get update
 apt-get upgrade -y
-apt-get install nano curl sudo 
+apt-get install nano curl sudo pwgen
 
 # 2. add user
 username=dude
