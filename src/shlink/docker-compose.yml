@@ -6,6 +6,8 @@ services:
   shlink:
     image: shlinkio/shlink:stable
     container_name: shlink_master
+    depends_on:
+      - database
     environment:
       - DEFAULT_DOMAIN=kgv-adl.kyrtech.net
       - IS_HTTPS_ENABLED=true
@@ -48,6 +50,8 @@ services:
     restart: always
     networks:
       - proxy
+    depends_on:
+      - shlink
     labels:
       traefik.enable: true
       traefik.http.routers.shlink-frontend.entrypoints: websecure
