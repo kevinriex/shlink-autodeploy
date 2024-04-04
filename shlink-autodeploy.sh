@@ -7,9 +7,9 @@ apt-get upgrade -y
 apt-get install nano curl sudo pwgen
 
 # 2. add user
-username=dude
+username="dude"
 userpasswd=$(pwgen -y -c -n -s 24 1)
-/sbin/useradd -m -p '${userpasswd}' ${username} /bin/bash
+/sbin/useradd -m -p $(openssl passwd -1 $userpasswd) -s /bin/bash ${username} 
 
 # n-1 print passwd for user
-echo "The new user is " ${username} "identified by: ${userpasswd}"
+echo "The new user is " $username "identified by: ${userpasswd}"
