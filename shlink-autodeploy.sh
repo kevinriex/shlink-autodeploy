@@ -1,9 +1,26 @@
 #!/bin/bash
 
+# variables file
+envfile='./.env'
+
+if [ -f $envfile ]; then
+    echo "Reading variables from $envfile"
+    source $envfile
+else
+    echo -e "#!/bin/bash
+    # Variables for shlink-autodeploy.sh
+    username=dude
+    domain=shlink-autodeploy.kyrtech.net
+    shlink_name="KGV An der Landwehr Links"
+    " > $envfile
+    exit 0
+fi
+
 # Function to print intro
 print_intro() {
     echo "##########################################################################"
-    printf '  /$$$$$$  /$$       /$$ /$$           /$$                                                 /$$                     /$$                     /$$                                                         /$$    
+    printf '
+  /$$$$$$  /$$       /$$ /$$           /$$                                                 /$$                     /$$                     /$$                                                         /$$    
  /$$__  $$| $$      | $$|__/          | $$                                                | $$                    | $$                    | $$                                                        | $$    
 | $$  \__/| $$$$$$$ | $$ /$$ /$$$$$$$ | $$   /$$                      /$$$$$$  /$$   /$$ /$$$$$$    /$$$$$$   /$$$$$$$  /$$$$$$   /$$$$$$ | $$  /$$$$$$  /$$   /$$ /$$$$$$/$$$$   /$$$$$$  /$$$$$$$  /$$$$$$  
 |  $$$$$$ | $$__  $$| $$| $$| $$__  $$| $$  /$$/       /$$$$$$       |____  $$| $$  | $$|_  $$_/   /$$__  $$ /$$__  $$ /$$__  $$ /$$__  $$| $$ /$$__  $$| $$  | $$| $$_  $$_  $$ /$$__  $$| $$__  $$|_  $$_/  
@@ -13,7 +30,8 @@ print_intro() {
  \______/ |__/  |__/|__/|__/|__/  |__/|__/  \__/                     \_______/ \______/    \___/   \______/  \_______/ \_______/| $$____/ |__/ \______/  \____  $$|__/ |__/ |__/ \_______/|__/  |__/   \___/  
                                                                                                                                 | $$                     /$$  | $$                                            
                                                                                                                                 | $$                    |  $$$$$$/                                            
-                                                                                                                                |__/                     \______/                                             '
+                                                                                                                                |__/                     \______/                                             
+'
     echo "##########################################################################"
 }
 
@@ -26,7 +44,6 @@ install_tools() {
 
 # Function to add user
 add_user() {
-    username="dude"
     userpasswd=$(pwgen -y -c -n -s 24 1)
 
     /sbin/useradd -m -p $(openssl passwd -1 $userpasswd) -s /bin/bash ${username} 
@@ -74,6 +91,13 @@ prepare_environment() {
     curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/dev/src/portainer/docker-compose.yml" -o /storage/compose/portainer/docker-compose.yml
 }
 
+# Function to write variables into configs
+parse_variables() {
+  sed -i "s/{{DOMAIN}}/$domain/g" /storage/compose/traefik/docker-compose.yml
+  sed -i "s/{{DOMAIN}}/$domain/g" /storage/compose/shlink/docker-compose.yml
+  sed -i "s/{{DOMAIN}}/$domain/g" /storage/compose/portainer/docker-compose.yml
+}
+
 # Function to create configurations
 create_configs() {
     # Create Shlink configurations
@@ -98,7 +122,7 @@ start_services() {
 # Function to configure web interface
 configure_web_interface() {
     apikey=$(docker exec -it shlink_master shlink api-key:generate | grep -oP '(?:")(.*)(?:")' | sed 's/"//g')
-    echo -e "[\n  {\n    \"name\": \"KGV An der Landwehr\",\n    \"url\": \"https://kgv-adl.kyrtech.net\",\n    \"apiKey\": \"$apikey\"\n  }\n]" > /storage/compose/shlink/data/servers.json
+    echo -e "[\n  {\n    \"name\": \"KGV An der Landwehr\",\n    \"url\": \"https://shlink-autodeploy.kyrtech.net\",\n    \"apiKey\": \"$apikey\"\n  }\n]" > /storage/compose/shlink/data/servers.json
 }
 
 # Function to print user's password
@@ -113,9 +137,10 @@ main() {
     add_user
     install_docker
     prepare_environment
+    parse_variables
     create_configs
-    start_services
-    configure_web_interface
+    #start_services
+    #configure_web_interface
     print_user_password
 }
 

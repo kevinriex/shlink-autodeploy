@@ -9,7 +9,7 @@ services:
     depends_on:
       - database
     environment:
-      - DEFAULT_DOMAIN=kgv-adl.kyrtech.net
+      - DEFAULT_DOMAIN={{DOMAIN}}
       - IS_HTTPS_ENABLED=true
       #- GEOLITE_LICENSE_KEY=
       - DB_DRIVER=mariadb
@@ -23,7 +23,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.shlink-backend.entrypoints: websecure
-      traefik.http.routers.shlink-backend.rule: Host(`kgv-adl.kyrtech.net`)
+      traefik.http.routers.shlink-backend.rule: Host(`{{DOMAIN}}`)
       traefik.http.routers.shlink-backend.tls: true
       traefik.http.routers.shlink-backend.tls.certresolver: production
       traefik.http.services.shlink-backend.loadbalancer.server.port: 8080
@@ -55,7 +55,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.shlink-frontend.entrypoints: websecure
-      traefik.http.routers.shlink-frontend.rule: Host(`links.kgv-adl.kyrtech.net`)
+      traefik.http.routers.shlink-frontend.rule: Host(`links.{{DOMAIN}}`)
       traefik.http.routers.shlink-frontend.tls: true
       traefik.http.routers.shlink-frontend.tls.certresolver: staging
       traefik.http.services.shlink-frontend.loadbalancer.server.port: 8080

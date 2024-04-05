@@ -4,6 +4,7 @@ echo "Starting server cleaning process..."
 
 # variables
 username=dude
+envfile=./.env
 
 # stop docker-compose
 docker ps -aq | xargs docker stop | xargs docker rm
@@ -33,3 +34,5 @@ rm -rf /home/dude
 # remove packages
 apt-get purge pwgen ca-certificates -y 
 apt-get autoremove -y
+
+rm $envfile

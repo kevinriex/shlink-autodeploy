@@ -11,7 +11,7 @@ services:
         - /var/run/docker.sock:/var/run/docker.sock
     labels:
       traefik.enable: true
-      traefik.http.routers.portainer.rule: Host(`docker.kgv-adl.kyrtech.net`)
+      traefik.http.routers.portainer.rule: Host(`docker.{{DOMAIN}}`)
       traefik.http.routers.portainer.entrypoints: websecure
       traefik.http.routers.portainer.tls: true
       traefik.http.routers.portainer.tls.certResolver: staging
