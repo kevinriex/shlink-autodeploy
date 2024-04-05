@@ -1,8 +1,9 @@
 #!/bin/bash
 
-# 0. echo cool intro 
-echo "##########################################################################"
-printf '  /$$$$$$  /$$       /$$ /$$           /$$                                                 /$$                     /$$                     /$$                                                         /$$    
+# Function to print intro
+print_intro() {
+    echo "##########################################################################"
+    printf '  /$$$$$$  /$$       /$$ /$$           /$$                                                 /$$                     /$$                     /$$                                                         /$$    
  /$$__  $$| $$      | $$|__/          | $$                                                | $$                    | $$                    | $$                                                        | $$    
 | $$  \__/| $$$$$$$ | $$ /$$ /$$$$$$$ | $$   /$$                      /$$$$$$  /$$   /$$ /$$$$$$    /$$$$$$   /$$$$$$$  /$$$$$$   /$$$$$$ | $$  /$$$$$$  /$$   /$$ /$$$$$$/$$$$   /$$$$$$  /$$$$$$$  /$$$$$$  
 |  $$$$$$ | $$__  $$| $$| $$| $$__  $$| $$  /$$/       /$$$$$$       |____  $$| $$  | $$|_  $$_/   /$$__  $$ /$$__  $$ /$$__  $$ /$$__  $$| $$ /$$__  $$| $$  | $$| $$_  $$_  $$ /$$__  $$| $$__  $$|_  $$_/  
@@ -13,95 +14,110 @@ printf '  /$$$$$$  /$$       /$$ /$$           /$$                              
                                                                                                                                 | $$                     /$$  | $$                                            
                                                                                                                                 | $$                    |  $$$$$$/                                            
                                                                                                                                 |__/                     \______/                                             '
-echo "##########################################################################"
+    echo "##########################################################################"
+}
 
-# 1. install nessesary tools
+# Function to install necessary tools
+install_tools() {
+    apt-get update
+    apt-get upgrade -y
+    apt-get install nano curl sudo pwgen ca-certificates -y
+}
 
-apt-get update
-apt-get upgrade -y
-apt-get install nano curl sudo pwgen ca-certificates -y
+# Function to add user
+add_user() {
+    username="dude"
+    userpasswd=$(pwgen -y -c -n -s 24 1)
 
+    /sbin/useradd -m -p $(openssl passwd -1 $userpasswd) -s /bin/bash ${username} 
+    /sbin/usermod -aG sudo $username
+}
 
-# 2. add user
+# Function to install docker and docker-compose
+install_docker() {
+    # Add Docker GPG key
+    install -m 0755 -d /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+    chmod a+r /etc/apt/keyrings/docker.asc
 
-username="dude"
-userpasswd=$(pwgen -y -c -n -s 24 1)
+    # Add Docker repository to sources.list
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    apt-get update
 
-/sbin/useradd -m -p $(openssl passwd -1 $userpasswd) -s /bin/bash ${username} 
-/sbin/usermod -aG sudo $username
+    # Install Docker
+    apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin
 
+    # Install Docker Compose
+    curl -L "https://github.com/docker/compose/releases/download/v2.26.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    chmod +x /usr/local/bin/docker-compose
 
-# 3. install docker-cd
-# docs: https://docs.docker.com/engine/install/debian/
+    # Add user to docker group
+    /sbin/usermod -aG docker $username
+}
 
-# gpg key
-install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
-chmod a+r /etc/apt/keyrings/docker.asc
+# Function to create necessary directories and download docker-compose files
+prepare_environment() {
+    mkdir /storage
+    echo "script: created /storage"
+    mkdir /storage/compose
+    echo "script: created /storage/compose"
+    mkdir /storage/compose/traefik
+    mkdir /storage/compose/shlink
+    mkdir /storage/compose/portainer
+    echo "script: created /storage/compose/<services>"
 
-# add source-repo to sources.list
-echo \
-"deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian \
-$(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-apt-get update
+    chown $username:$username /storage -R
 
-# install
-apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin
+    # Download docker-compose files
+    curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/dev/src/shlink/docker-compose.yml" -o /storage/compose/shlink/docker-compose.yml
+    curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/dev/src/traefik/docker-compose.yml" -o /storage/compose/traefik/docker-compose.yml
+    curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/dev/src/portainer/docker-compose.yml" -o /storage/compose/portainer/docker-compose.yml
+}
 
-# install docker-compose
-curl -L "https://github.com/docker/compose/releases/download/v2.26.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-chmod +x /usr/local/bin/docker-compose
+# Function to create configurations
+create_configs() {
+    # Create Shlink configurations
+    mkdir /storage/compose/shlink/data/
+    touch /storage/compose/shlink/data/servers.json
 
-# add user to docker group
-/sbin/usermod -aG docker $username
+    # Create Traefik configurations
+    mkdir /storage/compose/traefik/config
+    mkdir /storage/compose/traefik/config/certs
+    touch /storage/compose/traefik/config/certs/acme.json
+    chmod 600 /storage/compose/traefik/config/certs/acme.json
+    curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/dev/src/traefik/config/traefik.yaml" -o /storage/compose/traefik/config/traefik.yaml
+}
 
-# 4. create proxy.docker-network
-docker network create -d bridge proxy
+# Function to start docker-compose services
+start_services() {
+    docker-compose -f /storage/compose/portainer/docker-compose.yml up -d
+    docker-compose -f /storage/compose/shlink/docker-compose.yml up -d 
+    docker-compose -f /storage/compose/traefik/docker-compose.yml up -d
+}
 
-# 5. download docker-compose-files
-mkdir /storage
-echo "script: created /storage"
-mkdir /storage/compose
-echo "script: created /storage/compose"
-mkdir /storage/compose/traefik
-mkdir /storage/compose/shlink
-mkdir /storage/compose/portainer
-echo "script: created /storage/compose/<services>"
+# Function to configure web interface
+configure_web_interface() {
+    apikey=$(docker exec -it shlink_master shlink api-key:generate | grep -oP '(?:")(.*)(?:")' | sed 's/"//g')
+    echo -e "[\n  {\n    \"name\": \"KGV An der Landwehr\",\n    \"url\": \"https://kgv-adl.kyrtech.net\",\n    \"apiKey\": \"$apikey\"\n  }\n]" > /storage/compose/shlink/data/servers.json
+}
 
+# Function to print user's password
+print_user_password() {
+    echo "The new user is $username identified by: ${userpasswd}"
+}
 
-chown $username:$username /storage -R
+# Main function
+main() {
+    print_intro
+    install_tools
+    add_user
+    install_docker
+    prepare_environment
+    create_configs
+    start_services
+    configure_web_interface
+    print_user_password
+}
 
-
-curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/dev/src/shlink/docker-compose.yml" -o /storage/compose/shlink/docker-compose.yml
-curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/dev/src/traefik/docker-compose.yml" -o /storage/compose/traefik/docker-compose.yml
-curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/dev/src/portainer/docker-compose.yml" -o /storage/compose/portainer/docker-compose.yml
-
-# 6.create configs
-mkdir /storage/compose/shlink/data/
-touch /storage/compose/shlink/data/servers.json
-
-mkdir /storage/compose/traefik/config
-mkdir /storage/compose/traefik/config/certs
-touch /storage/compose/traefik/config/certs/acme.json
-chmod 600 /storage/compose/traefik/config/certs/acme.json
-curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/dev/src/traefik/config/traefik.yaml" -o /storage/compose/traefik/config/traefik.yaml
-
-# 7. start docker-compose
-docker-compose -f /storage/compose/portainer/docker-compose.yml up -d
-docker-compose -f /storage/compose/shlink/docker-compose.yml up -d 
-docker-compose -f /storage/compose/traefik/docker-compose.yml up -d
-
-
-# 8. configuring web-interface
-apikey=$(docker exec -it shlink_master shlink api-key:generate | grep -oP '(?:")(.*)(?:")' | sed 's/"//g')
-echo -e "[
-  {
-    "name": "KGV An der Landwehr",
-    "url": "https://kgv-adl.kyrtech.net",
-    "apiKey": "$apikey"
-  }
-]" > /storage/compose/shlink/data/servers.json
-
-# n-1 print passwd for user
-echo "The new user is " $username "identified by: ${userpasswd}"
+# Execute the main function
+main
