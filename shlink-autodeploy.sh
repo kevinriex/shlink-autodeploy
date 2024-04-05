@@ -10,11 +10,11 @@ else
     echo "Created $envfile"
     echo "Please fill with variables then restart the script"
     echo -e "#!/bin/bash
-    # Variables for shlink-autodeploy.sh
-    username=dude
-    domain=shlink-autodeploy.kyrtech.net
-    shlink_name="shlink-autodeploy.kyrtech.net Links"
-    " > $envfile
+# Variables for shlink-autodeploy.sh
+username=dude
+domain=shlink-autodeploy.kyrtech.net
+hlink_name="shlink-autodeploy.kyrtech.net Links"
+" > $envfile
     exit 0
 fi
 
