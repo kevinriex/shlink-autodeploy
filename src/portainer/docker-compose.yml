@@ -1,3 +1,7 @@
+networks:
+  proxy:
+    external: true
+
 services:
   portainer:
     image: portainer/portainer-ce:latest
