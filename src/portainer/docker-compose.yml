@@ -1,0 +1,15 @@
+services:
+  portainer:
+    image: portainer/portainer-ce:latest
+    volumes:
+        - ./data:/data
+        - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      traefik.enable: true
+      traefik.http.routers.traefik_https.rule: Host(`docker.kgv-adl.kyrtech.net`)
+      traefik.http.routers.traefik_https.entrypoints: websecure
+      traefik.http.routers.traefik_https.tls: true
+      traefik.http.routers.traefik_https.tls.certResolver: production
+      traefik.http.services.shlink-frontend.loadbalancer.server.port: 80 
+    networks:
+    restart: unless-stopped
