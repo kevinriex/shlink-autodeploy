@@ -1,5 +1,7 @@
 # ToDo´s
 
+## Remove /dev links
+
 ## docker-compose
 
 1. shlink add geolite variable
