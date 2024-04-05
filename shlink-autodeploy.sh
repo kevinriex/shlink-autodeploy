@@ -7,11 +7,13 @@ if [ -f $envfile ]; then
     echo "Reading variables from $envfile"
     source $envfile
 else
+    echo "Created $envfile"
+    echo "Please fill with variables then restart the script"
     echo -e "#!/bin/bash
     # Variables for shlink-autodeploy.sh
     username=dude
     domain=shlink-autodeploy.kyrtech.net
-    shlink_name="KGV An der Landwehr Links"
+    shlink_name="shlink-autodeploy.kyrtech.net Links"
     " > $envfile
     exit 0
 fi
@@ -112,6 +114,11 @@ create_configs() {
     curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/dev/src/traefik/config/traefik.yaml" -o /storage/compose/traefik/config/traefik.yaml
 }
 
+# Function to create docker network 
+create_docker_network() {
+  docker network create -d bridge proxy
+}
+
 # Function to start docker-compose services
 start_services() {
     docker-compose -f /storage/compose/portainer/docker-compose.yml up -d
@@ -139,8 +146,9 @@ main() {
     prepare_environment
     parse_variables
     create_configs
-    #start_services
-    #configure_web_interface
+    create_docker_network
+    start_services
+    configure_web_interface
     print_user_password
 }
 
