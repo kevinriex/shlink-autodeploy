@@ -5,7 +5,7 @@ networks:
 services:
   portainer:
     image: portainer/portainer-ce:latest
-    container_name: portainer
+    container_name: portainer_master
     volumes:
         - ./data:/data
         - /var/run/docker.sock:/var/run/docker.sock
