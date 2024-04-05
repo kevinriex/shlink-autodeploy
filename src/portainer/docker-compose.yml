@@ -11,11 +11,11 @@ services:
         - /var/run/docker.sock:/var/run/docker.sock
     labels:
       traefik.enable: true
-      traefik.http.routers.traefik_https.rule: Host(`docker.kgv-adl.kyrtech.net`)
-      traefik.http.routers.traefik_https.entrypoints: websecure
-      traefik.http.routers.traefik_https.tls: true
-      traefik.http.routers.traefik_https.tls.certResolver: staging
-      traefik.http.services.shlink-frontend.loadbalancer.server.port: 80 
+      traefik.http.routers.portainer.rule: Host(`docker.kgv-adl.kyrtech.net`)
+      traefik.http.routers.portainer.entrypoints: websecure
+      traefik.http.routers.portainer.tls: true
+      traefik.http.routers.portainer.tls.certResolver: staging
+      traefik.http.services.portainer.loadbalancer.server.port: 80 
     networks:
       - proxy
     restart: unless-stopped
