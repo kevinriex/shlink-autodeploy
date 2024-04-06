@@ -40,6 +40,7 @@ check_env() {
 # Variables for shlink-autodeploy.sh
 username=dude
 domain=shlink-autodep.kyrtech.net
+cert_email=certs.admin@me.kevinriex.de
 shlink_name="shlink-autodep.kyrtech.net Links"
 
 # Ctrl + S & Ctrl + X to save and exit (or continue)
@@ -125,6 +126,7 @@ create_configs() {
     touch /storage/compose/traefik/config/certs/acme.json
     chmod 600 /storage/compose/traefik/config/certs/acme.json
     curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/${branch}src/traefik/config/traefik.yaml" -o /storage/compose/traefik/config/traefik.yaml
+    sed -i -e "s/{{E-MAIL}}/$cert_email" /storage/compose/traefik/config/traefik.yaml
 }
 
 # Function to create docker network 

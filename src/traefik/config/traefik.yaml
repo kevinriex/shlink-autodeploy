@@ -26,14 +26,14 @@ entryPoints:
 certificatesResolvers:
   staging:
     acme:
-      email: certs.admin@me.kevinriex.de
+      email: {{E-MAIL}}
       storage: /etc/traefik/certs/acme.json
       caServer: "https://acme-staging-v02.api.letsencrypt.org/directory"
       httpChallenge:
         entryPoint: web
   production:
     acme:
-      email: certs.admin@me.kevinriex.de
+      email: {{E-MAIL}}
       storage: /etc/traefik/certs/acme.json
       caServer: "https://acme-v02.api.letsencrypt.org/directory"
       httpChallenge:
