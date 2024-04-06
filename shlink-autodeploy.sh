@@ -33,8 +33,8 @@ check_env() {
   # variables file
   envfile='./.env'
 
-  if [ -f $envfile ]; then
-  else
+  if ![ -f $envfile ]; 
+  then
       echo "Created $envfile"
       echo -e "#!/bin/bash
   # Variables for shlink-autodeploy.sh
@@ -179,7 +179,6 @@ main() {
 
 # Execute the main function
 main
-if [ -t 1 ] then
-else
-    rm ./shlink-autodeploy.sh
+if ![ -t 1 ] then
+  rm ./shlink-autodeploy.sh
 fi
