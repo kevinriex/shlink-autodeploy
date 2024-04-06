@@ -26,7 +26,7 @@ domain.tld.    IN    AAAA  1234:5678:90ab:cdef:1234:5678:90ab:cdef
 ## Start Script
 
 ```bash
-curl -L https://raw.githubusercontent.com/kevinriex/shlink-autodeploy/master/shlink-autodeploy.sh | sudo bash
+curl -L https://raw.githubusercontent.com/kevinriex/shlink-autodeploy/main/shlink-autodeploy.sh | sudo bash
 ```
 
 ## Clean Server
@@ -34,7 +34,7 @@ curl -L https://raw.githubusercontent.com/kevinriex/shlink-autodeploy/master/shl
 This script removes all changed made to the server including ALL DATA!!
 
 ```bash
-curl -L https://raw.githubusercontent.com/kevinriex/shlink-autodeploy/master/clean-server.sh | sudo bash
+curl -L https://raw.githubusercontent.com/kevinriex/shlink-autodeploy/main/clean-server.sh | sudo bash
 ```
 
 ## Management Commands

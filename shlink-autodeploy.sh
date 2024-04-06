@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Variable sets the branch | options: master/ dev/
-branch="master/"
+# Variable sets the branch | options: main/ dev/
+branch="main/"
 
 # Function to print intro
 print_intro() {
