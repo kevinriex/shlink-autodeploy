@@ -4,5 +4,7 @@ jobs:
     Check-Syntax:
         runs-on: ubuntu-latest
         steps:
+            - name: Checkout
+              uses: actions/checkout@v4
             - run: bash -n /github/workspace/clean-server.sh
             - run: bash -n /github/workspace/link-autodeploy.sh
