@@ -1,23 +1,5 @@
 #!/bin/bash
 
-# variables file
-envfile='./.env'
-
-if [ -f $envfile ]; then
-    echo "Reading variables from $envfile"
-    source $envfile
-else
-    echo "Created $envfile"
-    echo "Please fill with variables then restart the script"
-    echo -e "#!/bin/bash
-# Variables for shlink-autodeploy.sh
-username=dude
-domain=shlink-autodeploy.kyrtech.net
-hlink_name="shlink-autodeploy.kyrtech.net Links"
-" > $envfile
-    exit 0
-fi
-
 # Function to print intro
 print_intro() {
     echo "##########################################################################"
@@ -42,6 +24,27 @@ install_tools() {
     apt-get update
     apt-get upgrade -y
     apt-get install nano curl sudo pwgen ca-certificates -y
+}
+
+read_env() {
+  # variables file
+  envfile='./.env'
+
+  if [ -f $envfile ]; then
+      echo "Reading variables from $envfile"
+      source $envfile
+  else
+      echo "Created $envfile"
+      echo -e "#!/bin/bash
+  # Variables for shlink-autodeploy.sh
+  username=dude
+  domain=shlink-autodeploy.kyrtech.net
+  shlink_name="shlink-autodeploy.kyrtech.net Links"
+
+  # Ctrl + S & Ctrl + X to save and exit (or continue)
+  " > $envfile
+      nano -c .env
+  fi
 }
 
 # Function to add user
@@ -122,14 +125,24 @@ create_docker_network() {
 # Function to start docker-compose services
 start_services() {
     docker-compose -f /storage/compose/portainer/docker-compose.yml up -d
-    docker-compose -f /storage/compose/shlink/docker-compose.yml up -d 
+    docker-compose -f /storage/compose/shlink/docker-compose.yml up -d
     docker-compose -f /storage/compose/traefik/docker-compose.yml up -d
 }
 
 # Function to configure web interface
 configure_web_interface() {
+    sleep 5
     apikey=$(docker exec -it shlink_master shlink api-key:generate | grep -oP '(?:")(.*)(?:")' | sed 's/"//g')
-    echo -e "[\n  {\n    \"name\": \"KGV An der Landwehr\",\n    \"url\": \"https://shlink-autodeploy.kyrtech.net\",\n    \"apiKey\": \"$apikey\"\n  }\n]" > /storage/compose/shlink/data/servers.json
+    echo $apikey
+    echo -e "[
+  {  
+  \"name\": \"Shlink-Autodeploy\", 
+  \"url\": \"https://shlink-autodeploy.kyrtech.net\",
+  \"apiKey\": \"$apikey\"
+  }
+]" > /storage/compose/shlink/data/servers.json
+  	docker stop shlink_web
+    docker start shlink_web
 }
 
 # Function to print user's password
@@ -141,6 +154,7 @@ print_user_password() {
 main() {
     print_intro
     install_tools
+    read_env
     add_user
     install_docker
     prepare_environment
