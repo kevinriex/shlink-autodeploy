@@ -1,6 +1,7 @@
 #!/bin/bash
 
-dev="dev/"
+# Variable sets the branch | options: master/ dev/
+branch="master/"
 
 # Function to print intro
 print_intro() {
@@ -28,13 +29,11 @@ install_tools() {
     apt-get install nano curl sudo pwgen ca-certificates -y
 }
 
-read_env() {
+check_env() {
   # variables file
   envfile='./.env'
 
   if [ -f $envfile ]; then
-      echo "Reading variables from $envfile"
-      source $envfile
   else
       echo "Created $envfile"
       echo -e "#!/bin/bash
@@ -45,7 +44,13 @@ read_env() {
 
   # Ctrl + S & Ctrl + X to save and exit (or continue)
   " > $envfile
-      nano -c .env
+      if [ -t 1 ] then 
+        echo "script: automatic modification possible"
+        nano -c ./.env
+      else 
+        echo "script: automatic modifaction not possible"
+        echo "script: please edit '.env', then rerun shlink-autodeploy.sh"
+      fi
   fi
 }
 
@@ -93,9 +98,9 @@ prepare_environment() {
     chown $username:$username /storage -R
 
     # Download docker-compose files
-    curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/${dev}src/shlink/docker-compose.yml" -o /storage/compose/shlink/docker-compose.yml
-    curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/${dev}src/traefik/docker-compose.yml" -o /storage/compose/traefik/docker-compose.yml
-    curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/${dev}src/portainer/docker-compose.yml" -o /storage/compose/portainer/docker-compose.yml
+    curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/${branch}src/shlink/docker-compose.yml" -o /storage/compose/shlink/docker-compose.yml
+    curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/${branch}src/traefik/docker-compose.yml" -o /storage/compose/traefik/docker-compose.yml
+    curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/${branch}src/portainer/docker-compose.yml" -o /storage/compose/portainer/docker-compose.yml
 }
 
 # Function to write variables into configs
@@ -116,7 +121,7 @@ create_configs() {
     mkdir /storage/compose/traefik/config/certs
     touch /storage/compose/traefik/config/certs/acme.json
     chmod 600 /storage/compose/traefik/config/certs/acme.json
-    curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/${dev}src/traefik/config/traefik.yaml" -o /storage/compose/traefik/config/traefik.yaml
+    curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/${branch}src/traefik/config/traefik.yaml" -o /storage/compose/traefik/config/traefik.yaml
 }
 
 # Function to create docker network 
@@ -156,7 +161,11 @@ print_user_password() {
 main() {
     print_intro
     install_tools
-    read_env
+    check_env
+    
+    echo "Reading variables from $envfile"
+    source $envfile
+    
     add_user
     install_docker
     prepare_environment
@@ -170,3 +179,7 @@ main() {
 
 # Execute the main function
 main
+if [ -t 1 ] then
+else
+    rm ./shlink-autodeploy.sh
+fi
