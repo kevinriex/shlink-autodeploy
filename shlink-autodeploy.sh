@@ -170,14 +170,14 @@ main() {
     source $envfile
     
     add_user
-    # install_docker
-    # prepare_environment
-    # parse_variables
-    # create_configs
-    # create_docker_network
-    # start_services
-    # configure_web_interface
-    # print_user_password
+    install_docker
+    prepare_environment
+    parse_variables
+    create_configs
+    create_docker_network
+    start_services
+    configure_web_interface
+    print_user_password
 }
 
 # Execute the main function
