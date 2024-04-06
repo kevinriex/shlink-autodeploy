@@ -1,6 +1,7 @@
 #!/bin/bash
 
-dev="dev/"
+# Variable sets the branch | options: master/ dev/
+branch="master/"
 
 # Function to print intro
 print_intro() {
@@ -93,9 +94,9 @@ prepare_environment() {
     chown $username:$username /storage -R
 
     # Download docker-compose files
-    curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/${dev}src/shlink/docker-compose.yml" -o /storage/compose/shlink/docker-compose.yml
-    curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/${dev}src/traefik/docker-compose.yml" -o /storage/compose/traefik/docker-compose.yml
-    curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/${dev}src/portainer/docker-compose.yml" -o /storage/compose/portainer/docker-compose.yml
+    curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/${branch}src/shlink/docker-compose.yml" -o /storage/compose/shlink/docker-compose.yml
+    curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/${branch}src/traefik/docker-compose.yml" -o /storage/compose/traefik/docker-compose.yml
+    curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/${branch}src/portainer/docker-compose.yml" -o /storage/compose/portainer/docker-compose.yml
 }
 
 # Function to write variables into configs
@@ -116,7 +117,7 @@ create_configs() {
     mkdir /storage/compose/traefik/config/certs
     touch /storage/compose/traefik/config/certs/acme.json
     chmod 600 /storage/compose/traefik/config/certs/acme.json
-    curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/${dev}src/traefik/config/traefik.yaml" -o /storage/compose/traefik/config/traefik.yaml
+    curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/${branch}src/traefik/config/traefik.yaml" -o /storage/compose/traefik/config/traefik.yaml
 }
 
 # Function to create docker network 
