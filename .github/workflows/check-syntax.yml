@@ -6,6 +6,5 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - run: ls -la
             - run: bash -n ./clean-server.sh
-            - run: bash -n ./link-autodeploy.sh
+            - run: bash -n ./slink-autodeploy.sh
