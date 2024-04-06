@@ -7,4 +7,4 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v4
             - run: bash -n ./clean-server.sh
-            - run: bash -n ./slink-autodeploy.sh
+            - run: bash -n ./shlink-autodeploy.sh
