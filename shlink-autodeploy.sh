@@ -44,7 +44,7 @@ check_env() {
 
   # Ctrl + S & Ctrl + X to save and exit (or continue)
   " > $envfile
-      if [ -t 1 ] then 
+      if [ -t 1 ]; then 
         echo "script: automatic modification possible"
         nano -c ./.env
       else 
@@ -179,6 +179,6 @@ main() {
 
 # Execute the main function
 main
-if ![ -t 1 ] then
+if ![ -t 1 ]; then
   rm ./shlink-autodeploy.sh
 fi
