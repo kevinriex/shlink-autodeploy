@@ -29,14 +29,12 @@ install_tools() {
     apt-get install nano curl sudo pwgen ca-certificates -y
 }
 
-read_env() {
+check_env() {
   # variables file
   envfile='./.env'
 
-  if [ -f $envfile ]; then
-      echo "Reading variables from $envfile"
-      source $envfile
-  else
+  if ! [ -f $envfile ]; 
+  then
       echo "Created $envfile"
       echo -e "#!/bin/bash
   # Variables for shlink-autodeploy.sh
@@ -46,7 +44,13 @@ read_env() {
 
   # Ctrl + S & Ctrl + X to save and exit (or continue)
   " > $envfile
-      nano -c .env
+      if [ -t 1 ]; then 
+        echo "script: automatic modification possible"
+        nano -c ./.env
+      else 
+        echo "script: automatic modifaction not possible"
+        echo "script: please edit '.env', then rerun shlink-autodeploy.sh"
+      fi
   fi
 }
 
@@ -157,7 +161,11 @@ print_user_password() {
 main() {
     print_intro
     install_tools
-    read_env
+    check_env
+    
+    echo "Reading variables from $envfile"
+    source $envfile
+    
     add_user
     install_docker
     prepare_environment
@@ -171,3 +179,6 @@ main() {
 
 # Execute the main function
 main
+if ! [ -t 1 ]; then
+  rm ./shlink-autodeploy.sh
+fi
