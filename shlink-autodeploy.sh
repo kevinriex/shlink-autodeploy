@@ -50,7 +50,7 @@ shlink_name="shlink-autodeploy.kyrtech.net Links"
       else 
         echo "script: automatic modifaction not possible"
         echo "script: please edit '.env', then rerun './shlink-autodeploy.sh'"
-        curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/${branch}shlink-autodeploy.sh" -o "./shlink-autodeploy.sh"
+        curl -s -L "https://github.com/kevinriex/shlink-autodeploy/raw/${branch}shlink-autodeploy.sh" -o "./shlink-autodeploy.sh"
         chmod +x ./shlink-autodeploy.sh
         exit 0
       fi
