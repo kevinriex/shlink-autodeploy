@@ -141,7 +141,9 @@ start_services() {
 
 # Function to configure web interface
 configure_web_interface() {
-    sleep 5
+    echo "script: configure web ui! It make take a while..."
+    sleep 10
+    docker stop shlink_web
     apikey=$(docker exec -it shlink_master shlink api-key:generate | grep -oP '(?:")(.*)(?:")' | sed 's/"//g')
     echo $apikey
     echo -e "[
@@ -151,7 +153,6 @@ configure_web_interface() {
   \"apiKey\": \"$apikey\"
   }
 ]" > /storage/compose/shlink/data/servers.json
-  	docker stop shlink_web
     docker start shlink_web
 }
 
