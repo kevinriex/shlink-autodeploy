@@ -141,7 +141,7 @@ start_services() {
 
 # Function to configure web interface
 configure_web_interface() {
-    echo "script: configure web ui! It make take a while..."
+    echo "script: configure web ui! It may take a while..."
     sleep 10
     docker stop shlink_web
     apikey=$(docker exec -it shlink_master shlink api-key:generate | grep -oP '(?:")(.*)(?:")' | sed 's/"//g')
