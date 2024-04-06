@@ -1,0 +1,8 @@
+name: Check Bash Syntax
+on: [push]
+jobs:
+    Check-Syntax:
+        runs-on: debian:latest
+        steps:
+            - run: bash -n clean-server.sh
+            - run: bash -n shlink-autodeploy.sh
