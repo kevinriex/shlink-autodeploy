@@ -160,6 +160,14 @@ print_user_password() {
     echo "The new user is $username identified by: ${userpasswd}"
 }
 
+# Function removes file if downloaded
+remove_script() {
+  if  [ -f ./shlink-autodeploy.sh ]; 
+  then
+      rm ./shlink-autodeploy.sh
+  fi
+}
+
 # Main function
 main() {
     print_intro
@@ -178,10 +186,8 @@ main() {
     start_services
     configure_web_interface
     print_user_password
+    remove_script
 }
 
 # Execute the main function
 main
-if ! [ -t 1 ]; then
-  rm ./shlink-autodeploy.sh
-fi
