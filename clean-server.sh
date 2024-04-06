@@ -32,7 +32,7 @@ rm -rf /etc/apt/keyrings/docker.asc
 rm -rf /home/dude
 
 # remove packages
-apt-get purge pwgen ca-certificates -y 
+apt-get purge pwgen -y 
 apt-get autoremove -y
 
 rm $envfile
