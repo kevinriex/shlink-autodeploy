@@ -25,7 +25,7 @@ services:
       traefik.http.routers.shlink-backend.entrypoints: websecure
       traefik.http.routers.shlink-backend.rule: Host(`{{DOMAIN}}`)
       traefik.http.routers.shlink-backend.tls: true
-      traefik.http.routers.shlink-backend.tls.certresolver: production
+      traefik.http.routers.shlink-backend.tls.certresolver: production #staging
       traefik.http.services.shlink-backend.loadbalancer.server.port: 8080
 
   database:
@@ -57,7 +57,7 @@ services:
       traefik.http.routers.shlink-frontend.entrypoints: websecure
       traefik.http.routers.shlink-frontend.rule: Host(`links.{{DOMAIN}}`)
       traefik.http.routers.shlink-frontend.tls: true
-      traefik.http.routers.shlink-frontend.tls.certresolver: staging
+      traefik.http.routers.shlink-frontend.tls.certresolver: production #staging
       traefik.http.services.shlink-frontend.loadbalancer.server.port: 8080
       traefik.http.middlewares.basic-auth.basicauth.users: dude:$$2y$$05$$N3n52AujFzGLdYSwuMeK1OETJat3QOuyY0GjuQDzEF9hqsn0FAOVW
       traefik.http.routers.shlink-frontend.middlewares: basic-auth
