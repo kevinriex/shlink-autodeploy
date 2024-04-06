@@ -4,5 +4,5 @@ jobs:
     Check-Syntax:
         runs-on: ubuntu-latest
         steps:
-            - run: bash -n clean-server.sh
-            - run: bash -n shlink-autodeploy.sh
+            - run: bash -n /github/workspace/clean-server.sh
+            - run: bash -n /github/workspace/link-autodeploy.sh
