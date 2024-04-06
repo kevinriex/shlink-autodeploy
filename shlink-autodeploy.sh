@@ -39,8 +39,8 @@ check_env() {
       echo -e "#!/bin/bash
 # Variables for shlink-autodeploy.sh
 username=dude
-domain=shlink-autodeploy.kyrtech.net
-shlink_name="shlink-autodeploy.kyrtech.net Links"
+domain=shlink-autodep.kyrtech.net
+shlink_name="shlink-autodep.kyrtech.net Links"
 
 # Ctrl + S & Ctrl + X to save and exit (or continue)
 " > $envfile
@@ -149,7 +149,7 @@ configure_web_interface() {
     echo -e "[
   {  
   \"name\": \"Shlink-Autodeploy\", 
-  \"url\": \"https://shlink-autodeploy.kyrtech.net\",
+  \"url\": \"https://shlink-autodep.kyrtech.net\",
   \"apiKey\": \"$apikey\"
   }
 ]" > /storage/compose/shlink/data/servers.json
