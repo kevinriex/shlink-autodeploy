@@ -50,6 +50,7 @@ shlink_name="shlink-autodeploy.kyrtech.net Links"
       else 
         echo "script: automatic modifaction not possible"
         echo "script: please edit '.env', then rerun shlink-autodeploy.sh"
+        curl -O -L "https://github.com/kevinriex/shlink-autodeploy/raw/${branch}shlink-autodeploy.sh"
         exit 0
       fi
   fi
@@ -168,14 +169,14 @@ main() {
     source $envfile
     
     add_user
-    install_docker
-    prepare_environment
-    parse_variables
-    create_configs
-    create_docker_network
-    start_services
-    configure_web_interface
-    print_user_password
+    # install_docker
+    # prepare_environment
+    # parse_variables
+    # create_configs
+    # create_docker_network
+    # start_services
+    # configure_web_interface
+    # print_user_password
 }
 
 # Execute the main function
