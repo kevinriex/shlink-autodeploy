@@ -37,14 +37,14 @@ check_env() {
   then
       echo "Created $envfile"
       echo -e "#!/bin/bash
-  # Variables for shlink-autodeploy.sh
-  username=dude
-  domain=shlink-autodeploy.kyrtech.net
-  shlink_name="shlink-autodeploy.kyrtech.net Links"
+# Variables for shlink-autodeploy.sh
+username=dude
+domain=shlink-autodeploy.kyrtech.net
+shlink_name="shlink-autodeploy.kyrtech.net Links"
 
-  # Ctrl + S & Ctrl + X to save and exit (or continue)
-  " > $envfile
-      if [ -t 1 ]; then 
+# Ctrl + S & Ctrl + X to save and exit (or continue)
+" > $envfile
+      if ! [ -t 1 ]; then 
         echo "script: automatic modification possible"
         nano -c ./.env
       else 
