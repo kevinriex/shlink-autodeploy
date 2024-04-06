@@ -50,6 +50,7 @@ shlink_name="shlink-autodeploy.kyrtech.net Links"
       else 
         echo "script: automatic modifaction not possible"
         echo "script: please edit '.env', then rerun shlink-autodeploy.sh"
+        exit 0
       fi
   fi
 }
