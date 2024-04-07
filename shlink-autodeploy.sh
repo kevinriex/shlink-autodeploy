@@ -151,7 +151,7 @@ configure_web_interface() {
     echo -e "[
   {  
   \"name\": \"Shlink-Autodeploy\", 
-  \"url\": \"https://shlink-autodep.kyrtech.net\",
+  \"url\": \"https://$domain\",
   \"apiKey\": \"$apikey\"
   }
 ]" > /storage/compose/shlink/data/servers.json
