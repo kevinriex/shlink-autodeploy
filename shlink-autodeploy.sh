@@ -1,7 +1,11 @@
 #!/bin/bash
 
-# Variable sets the branch | options: main/ dev/
-branch="main/"
+# Variables
+
+branch="dev/" # Variable sets the branch | options: main/ dev/
+basepath="/storage/compose"
+basicauthpwd=$(pwgen -n -s 12 1)
+
 
 # Function to print intro
 print_intro() {
@@ -26,7 +30,7 @@ print_intro() {
 install_tools() {
     apt-get update
     apt-get upgrade -y
-    apt-get install nano curl sudo pwgen ca-certificates -y
+    apt-get install nano curl sudo pwgen ca-certificates apache2-utils -y
 }
 
 check_env() {
@@ -60,9 +64,9 @@ shlink_name="shlink-autodep.kyrtech.net Links"
 
 # Function to add user
 add_user() {
-    userpasswd=$(pwgen -y -c -n -s 24 1)
+    userpwd=$(pwgen -y -c -n -s 24 1)
 
-    /sbin/useradd -m -p $(openssl passwd -1 $userpasswd) -s /bin/bash ${username} 
+    /sbin/useradd -m -p $(openssl passwd -1 $userpwd) -s /bin/bash ${username} 
     /sbin/usermod -aG sudo $username
 }
 
@@ -92,41 +96,47 @@ install_docker() {
 prepare_environment() {
     mkdir /storage
     echo "script: created /storage"
-    mkdir /storage/compose
-    echo "script: created /storage/compose"
-    mkdir /storage/compose/traefik
-    mkdir /storage/compose/shlink
-    mkdir /storage/compose/portainer
-    echo "script: created /storage/compose/<services>"
+    mkdir $basepath
+    echo "script: created $basepath"
+    mkdir $basepath/traefik
+    mkdir $basepath/shlink
+    mkdir $basepath/portainer
+    echo "script: created $basepath/<services>"
 
     chown $username:$username /storage -R
 
     # Download docker-compose files
-    curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/${branch}src/shlink/docker-compose.yml" -o /storage/compose/shlink/docker-compose.yml
-    curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/${branch}src/traefik/docker-compose.yml" -o /storage/compose/traefik/docker-compose.yml
-    curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/${branch}src/portainer/docker-compose.yml" -o /storage/compose/portainer/docker-compose.yml
+    curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/${branch}src/shlink/docker-compose.yml" -o $basepath/shlink/docker-compose.yml
+    curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/${branch}src/traefik/docker-compose.yml" -o $basepath/traefik/docker-compose.yml
+    curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/${branch}src/portainer/docker-compose.yml" -o $basepath/portainer/docker-compose.yml
 }
 
 # Function to write variables into configs
 parse_variables() {
-  sed -i "s/{{DOMAIN}}/$domain/g" /storage/compose/traefik/docker-compose.yml
-  sed -i "s/{{DOMAIN}}/$domain/g" /storage/compose/shlink/docker-compose.yml
-  sed -i "s/{{DOMAIN}}/$domain/g" /storage/compose/portainer/docker-compose.yml
+
+  sed -i "s/{{DOMAIN}}/$domain/g" $basepath/traefik/docker-compose.yml
+  sed -i "s/{{DOMAIN}}/$domain/g" $basepath/shlink/docker-compose.yml
+  sed -i "s/{{DOMAIN}}/$domain/g" $basepath/portainer/docker-compose.yml
+
+  basicauthpwdhash=$(echo $basicauthpwd | htpasswd -nBi $username)
+
+  sed -i "s/{{AUTH-USER}}/$basicauthpwdhash/g" $basepath/traefik/docker-compose.yml
+  sed -i "s/{{AUTH-USER}}/$basicauthpwdhash/g" $basepath/shlink/docker-compose.yml
 }
 
 # Function to create configurations
 create_configs() {
     # Create Shlink configurations
-    mkdir /storage/compose/shlink/data/
-    touch /storage/compose/shlink/data/servers.json
+    mkdir $basepath/shlink/data/
+    touch $basepath/shlink/data/servers.json
 
     # Create Traefik configurations
-    mkdir /storage/compose/traefik/config
-    mkdir /storage/compose/traefik/config/certs
-    touch /storage/compose/traefik/config/certs/acme.json
-    chmod 600 /storage/compose/traefik/config/certs/acme.json
-    curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/${branch}src/traefik/config/traefik.yaml" -o /storage/compose/traefik/config/traefik.yaml
-    sed -i -e "s/{{E-MAIL}}/$cert_email/g" /storage/compose/traefik/config/traefik.yaml
+    mkdir $basepath/traefik/config
+    mkdir $basepath/traefik/config/certs
+    touch $basepath/traefik/config/certs/acme.json
+    chmod 600 $basepath/traefik/config/certs/acme.json
+    curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/${branch}src/traefik/config/traefik.yaml" -o $basepath/traefik/config/traefik.yaml
+    sed -i -e "s/{{E-MAIL}}/$cert_email/g" $basepath/traefik/config/traefik.yaml
 }
 
 # Function to create docker network 
@@ -136,9 +146,9 @@ create_docker_network() {
 
 # Function to start docker-compose services
 start_services() {
-    docker-compose -f /storage/compose/portainer/docker-compose.yml up -d
-    docker-compose -f /storage/compose/shlink/docker-compose.yml up -d
-    docker-compose -f /storage/compose/traefik/docker-compose.yml up -d
+    docker-compose -f $basepath/portainer/docker-compose.yml up -d
+    docker-compose -f $basepath/shlink/docker-compose.yml up -d
+    docker-compose -f $basepath/traefik/docker-compose.yml up -d
 }
 
 # Function to configure web interface
@@ -151,16 +161,18 @@ configure_web_interface() {
     echo -e "[
   {  
   \"name\": \"Shlink-Autodeploy\", 
-  \"url\": \"https://shlink-autodep.kyrtech.net\",
+  \"url\": \"https://$domain\",
   \"apiKey\": \"$apikey\"
   }
-]" > /storage/compose/shlink/data/servers.json
+]" > $basepath/shlink/data/servers.json
     docker start shlink_web
 }
 
 # Function to print user's password
 print_user_password() {
-    echo "The new user is $username identified by: ${userpasswd}"
+    echo "The new system-user is $username identified by: ${userpwd}"
+    echo "The new basic-auth-user is $username identified by: ${basicauthpwd}"
+    echo "Please save this information. it will never be shown"
 }
 
 # Function removes file if downloaded

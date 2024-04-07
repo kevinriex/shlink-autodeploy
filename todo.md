@@ -1,3 +1,3 @@
 # ToDo´s
 
-- traefik.yaml email
+- traefik.yaml username:hashpwd
