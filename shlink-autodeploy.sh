@@ -126,7 +126,7 @@ create_configs() {
     touch /storage/compose/traefik/config/certs/acme.json
     chmod 600 /storage/compose/traefik/config/certs/acme.json
     curl -L "https://github.com/kevinriex/shlink-autodeploy/raw/${branch}src/traefik/config/traefik.yaml" -o /storage/compose/traefik/config/traefik.yaml
-    sed -i -e "s/{{E-MAIL}}/$cert_email" /storage/compose/traefik/config/traefik.yaml
+    sed -i -e "s/{{E-MAIL}}/$cert_email/g" /storage/compose/traefik/config/traefik.yaml
 }
 
 # Function to create docker network 
