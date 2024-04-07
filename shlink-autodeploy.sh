@@ -4,7 +4,7 @@
 
 branch="dev/" # Variable sets the branch | options: main/ dev/
 basepath="/storage/compose"
-basicauthpwd=$(pwgen -n -s   12 1)
+basicauthpwd=$(pwgen -n -s 12 1)
 
 
 # Function to print intro
@@ -122,7 +122,7 @@ parse_variables() {
   sed -i "s/{{USER}}/$username/g" $basepath/shlink/docker-compose.yml
   sed -i "s/{{USER}}/$username/g" $basepath/portainer/docker-compose.yml
 
-  basicauthpwdhash=$(echo $basicauthpwd | md5sum | awk '{print $1}')
+  basicauthpwdhash=$(echo $(htpasswd -nBb $username $basicauthpwd))
 
   sed -i "s/{{PASSWORD}}/$basicauthpwdhash/g" $basepath/traefik/docker-compose.yml
   sed -i "s/{{PASSWORD}}/$basicauthpwdhash/g" $basepath/shlink/docker-compose.yml
