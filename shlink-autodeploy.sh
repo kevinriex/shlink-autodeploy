@@ -30,7 +30,7 @@ print_intro() {
 install_tools() {
     apt-get update
     apt-get upgrade -y
-    apt-get install nano curl sudo pwgen ca-certificates htpasswd -y
+    apt-get install nano curl sudo pwgen ca-certificates apache2-utils -y
 }
 
 check_env() {
