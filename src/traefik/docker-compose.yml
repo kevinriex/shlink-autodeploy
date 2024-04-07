@@ -20,7 +20,7 @@ services:
       traefik.http.routers.traefik_https.tls: true
       traefik.http.routers.traefik_https.tls.certResolver: production #staging
       traefik.http.routers.traefik_https.service: api@internal 
-      traefik.http.middlewares.basic-auth-traefik.basicauth.users: "{{USER}}:{{PASSWORD}}"
+      traefik.http.middlewares.basic-auth-traefik.basicauth.users: "{{AUTH-USER}}"
       traefik.http.routers.traefik_https.middlewares: basic-auth-traefik
     networks:
       - proxy

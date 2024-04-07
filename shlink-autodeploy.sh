@@ -118,13 +118,10 @@ parse_variables() {
   sed -i "s/{{DOMAIN}}/$domain/g" $basepath/shlink/docker-compose.yml
   sed -i "s/{{DOMAIN}}/$domain/g" $basepath/portainer/docker-compose.yml
 
-  sed -i "s/{{USER}}/$username/g" $basepath/traefik/docker-compose.yml
-  sed -i "s/{{USER}}/$username/g" $basepath/shlink/docker-compose.yml
-
   basicauthpwdhash=$(echo $basicauthpwd | htpasswd -nBi $username)
 
-  sed -i "s/{{PASSWORD}}/$basicauthpwdhash/g" $basepath/traefik/docker-compose.yml
-  sed -i "s/{{PASSWORD}}/$basicauthpwdhash/g" $basepath/shlink/docker-compose.yml
+  sed -i "s/{{AUTH-USER}}/$basicauthpwdhash/g" $basepath/traefik/docker-compose.yml
+  sed -i "s/{{AUTH-USER}}/$basicauthpwdhash/g" $basepath/shlink/docker-compose.yml
 }
 
 # Function to create configurations
